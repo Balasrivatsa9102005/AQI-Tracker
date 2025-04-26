@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Index Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2980b9;
+            --good: #2ecc71;
+            --fair: #f1c40f;
+            --moderate: #e67e22;
+            --poor: #e74c3c;
+            --very-poor: #c0392b;
+            --glass: rgba(255, 255, 255, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            min-height: 100vh;
+            background: url('https://cdn.pixabay.com/photo/2020/07/27/14/34/stars-5442598_1280.jpg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            backdrop-filter: blur(10px);
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+        
+        h1 {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .search-box {
+            display: flex;
+            width: 100%;
+            max-width: 600px;
+            backdrop-filter: blur(10px);
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px 0 0 8px;
+            font-size: 16px;
+            outline: none;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        input[type="text"]:focus {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        button {
+            padding: 0 25px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: var(--secondary);
+        }
+        
+        .error {
+            color: #ff6b6b;
+            text-align: center;
+            margin: 15px 0;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 107, 107, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .dashboard {
+            backdrop-filter: blur(10px);
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            margin-bottom: 30px;
+        }
+        
+        .aqi-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .aqi-value {
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 10px 0;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .aqi-good { color: var(--good); }
+        .aqi-fair { color: var(--fair); }
+        .aqi-moderate { color: var(--moderate); }
+        .aqi-poor { color: var(--poor); }
+        .aqi-very-poor { color: var(--very-poor); }
+        
+        .location-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .location-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .component-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s;
+        }
+        
+        .component-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .component-name {
+            font-weight: 500;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .component-value {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .components-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Air Quality Index Tracker</h1>
+            <p>Check real-time pollution levels anywhere in the world</p>
+        </header>
+        
+        <form method="POST" class="search-container">
+            <div class="search-box">
+                <input type="text" name="city" placeholder="Enter city name (e.g., London, Tokyo)" required>
+                <button type="submit">Search</button>
+            </div>
+        </form>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if city %}
+        <div class="dashboard">
+            <div class="location-info">
+                <h2>{{ city }}{% if country %}, {{ country }}{% endif %}</h2>
+                <p>Last updated: {{ date }}</p>
+            </div>
+            
+            <div class="aqi-display">
+                <h3>Air Quality Index</h3>
+                <div class="aqi-value aqi-{{ aqi_label | lower | replace(' ', '-') }}">{{ aqi }}</div>
+                <div class="aqi-label aqi-{{ aqi_label | lower | replace(' ', '-') }}">{{ aqi_label }}</div>
+            </div>
+            
+            <h3 style="text-align: center; margin-bottom: 15px;">Pollution Components (μg/m³)</h3>
+            <div class="components-grid">
+                <div class="component-item">
+                    <div class="component-name">Carbon Monoxide (CO)</div>
+                    <div class="component-value">{{ components.co }}</div>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Nitrogen Monoxide (NO)</div>
+                    <div class="component-value">{{ components.no }}</div>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Nitrogen Dioxide (NO₂)</div>
+                    <div class="component-value">{{ components.no2 }}</div>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Ozone (O₃)</div>
+                    <div class="component-value">{{ components.o3 }}</div>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Sulfur Dioxide (SO₂)</div>
+                    <div class="component-value">{{ components.so2 }}</div>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Fine Particles (PM2.5)</div>
+                    <div class="component-value">{{ components.pm2_5 }}</div>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Coarse Particles (PM10)</div>
+                    <div class="component-value">{{ components.pm10 }}</div>
+                </div>
+                <div class="component-item">
+                    <div class="component-name">Ammonia (NH₃)</div>
+                    <div class="component-value">{{ components.nh3 }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <footer>
+            <p> ©2025 Pollution Tracker | Bala Srivatsa Panigrahi </p>
+        </footer>
+    </div>
+</body>
+</html>
